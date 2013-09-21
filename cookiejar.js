@@ -1,44 +1,21 @@
-/**
-* Javascript code to store data as JSON strings in cookies. 
-* It uses prototype.js 1.5.1 (http://www.prototypejs.org)
-* 
-* Author : Lalit Patel
-* Website: http://www.lalit.org/lab/jsoncookies
-* License: Apache Software License 2
-*          http://www.apache.org/licenses/LICENSE-2.0
-* Version: 0.5
-* Updated: Jan 26, 2009 
-* 
-* Chnage Log:
-*   v 0.5
-*   -  Changed License from CC to Apache 2
-*   v 0.4
-*   -  Removed a extra comma in options (was breaking in IE and Opera). (Thanks Jason)
-*   -  Removed the parameter name from the initialize function
-*   -  Changed the way expires date was being calculated. (Thanks David)
-*   v 0.3
-*   -  Removed dependancy on json.js (http://www.json.org/json.js)
-*   -  empty() function only deletes the cookies set by CookieJar
-*/
-
 var CookieJar = Class.create();
 
 CookieJar.prototype = {
 
   /**
-  * Append before all cookie names to differntiate them.
+  * Prepend before all cookie names to differentiate them.
   */
-  appendString: "__CJ_",
+  prependString: "__CJ_",
 
   /**
   * Initializes the cookie jar with the options.
   */
   initialize: function(options) {
     this.options = {
-      expires: 3600,		// seconds (1 hr)
-      path: '',			// cookie path
-      domain: '',			// cookie domain
-      secure: ''			// secure ?
+      expires: 3600,    // seconds (1 hr)
+      path: '',         // cookie path
+      domain: '',       // cookie domain
+      secure: ''        // secure ?
     };
     Object.extend(this.options, options || {});
 
@@ -61,10 +38,10 @@ CookieJar.prototype = {
   },
 
   /**
-  * Adds a name values pair.
+  * Adds a name value pair.
   */
   put: function(name, value) {
-    name = this.appendString + name;
+    name = this.prependString + name;
     cookie = this.options;
     var type = typeof value;
     switch(type) {
@@ -83,12 +60,16 @@ CookieJar.prototype = {
     }
     return true;
   },
+  
+  set: function(name, value){
+    this.put(name, value);
+  },
 
   /**
-  * Removes a particular cookie (name value pair) form the Cookie Jar.
+  * Removes a particular cookie (name value pair) from the Cookie Jar.
   */
   remove: function(name) {
-    name = this.appendString + name;
+    name = this.prependString + name;
     cookie = this.options;
     try {
       var date = new Date();
@@ -105,7 +86,7 @@ CookieJar.prototype = {
   * Return a particular cookie by name;
   */
   get: function(name) {
-    name = this.appendString + name;
+    name = this.prependString + name;
     var cookies = document.cookie.match(name + '=(.*?)(;|$)');
     if (cookies) {
       return (unescape(cookies[1])).evalJSON();
@@ -146,7 +127,7 @@ CookieJar.prototype = {
     keys = $A();
     keyRe= /[^=; ]+(?=\=)/g;
     str  = document.cookie;
-    CJRe = new RegExp("^" + this.appendString);
+    CJRe = new RegExp("^" + this.prependString);
     while((match = keyRe.exec(str)) != undefined) {
       if (CJRe.test(match[0].strip())) {
         keys.push(match[0].strip().gsub(CJRe,""));
